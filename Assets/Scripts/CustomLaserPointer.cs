@@ -48,7 +48,7 @@ public class CustomLaserPointer : MonoBehaviour
             GameObject objectHit = hit.transform.gameObject;
 
             OVRSemanticClassification classification = objectHit?.GetComponentInParent<OVRSemanticClassification>();
-            if(classification.Labels.Count > 0)
+            if(classification != null && classification.Labels?.Count > 0)
             {
                 displayText.text = classification.Labels[0];
             }
