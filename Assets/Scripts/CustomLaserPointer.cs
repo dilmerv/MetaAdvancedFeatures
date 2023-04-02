@@ -1,12 +1,17 @@
 using Meta.WitAi;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using static OVRSceneManager;
 
 public class CustomLaserPointer : MonoBehaviour
 {
     [SerializeField]
     private OVRControllerHelper controller;
+
+    [SerializeField]
+    private TextMeshProUGUI displayText = null;
 
     [SerializeField]
     private Material lineMaterial;
@@ -41,12 +46,25 @@ public class CustomLaserPointer : MonoBehaviour
         if (Physics.Raycast(ray, out hit, lineMaxLength))
         {
             GameObject objectHit = hit.transform.gameObject;
-            Debug.Log("Object Hit: " + objectHit.name);
+
+            OVRSemanticClassification classification = objectHit?.GetComponentInParent<OVRSemanticClassification>();
+            if(classification.Labels.Count > 0)
+            {
+                displayText.text = classification.Labels[0];
+            }
+            else
+            {
+                displayText.text = string.Empty;
+            }
+
+
             lineRenderer.SetPosition(0, controllerPosition);
             lineRenderer.SetPosition(1, hit.point);
         }
         else
         {
+            displayText.text = string.Empty;
+
             lineRenderer.SetPosition(0, controllerPosition);
             lineRenderer.SetPosition(1, controllerPosition + controllerRotation * Vector3.forward * lineMaxLength);
         }
