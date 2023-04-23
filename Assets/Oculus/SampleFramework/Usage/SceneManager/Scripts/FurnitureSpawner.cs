@@ -21,6 +21,9 @@ public class FurnitureSpawner : MonoBehaviour
         _classification = GetComponent<OVRSemanticClassification>();
         AddRoomLight();
         SpawnSpawnable();
+
+        if(_classification.Contains(OVRSceneManager.Classification.Desk))
+            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z * -1);
     }
 
     private void SpawnSpawnable()
@@ -43,34 +46,34 @@ public class FurnitureSpawner : MonoBehaviour
 
         if (_classification && plane)
         {
-	        dimensions = plane.Dimensions;
-	        dimensions.z = 1;
+            dimensions = plane.Dimensions;
+            dimensions.z = 1;
 
-	        // Special case 01: Has only top plane
-	        if (_classification.Contains(OVRSceneManager.Classification.Desk) ||
-	            _classification.Contains(OVRSceneManager.Classification.Couch))
-	        {
-	            GetVolumeFromTopPlane(
-	                transform,
-	                plane.Dimensions,
-	                transform.position.y,
-	                out position,
-	                out rotation,
-	                out localScale);
+            // Special case 01: Has only top plane
+            if (_classification.Contains(OVRSceneManager.Classification.Desk) ||
+                _classification.Contains(OVRSceneManager.Classification.Couch))
+            {
+                GetVolumeFromTopPlane(
+                    transform,
+                    plane.Dimensions,
+                    transform.position.y,
+                    out position,
+                    out rotation,
+                    out localScale);
 
-	            dimensions = localScale;
-	            // The pivot for the resizer is at the top
-	            position.y += localScale.y / 2.0f;
-	        }
+                dimensions = localScale;
+                // The pivot for the resizer is at the top
+                position.y += localScale.y / 2.0f;
+            }
 
-	        // Special case 02: Set wall thickness to something small instead of default value (1.0m)
-	        if (_classification.Contains(OVRSceneManager.Classification.WallFace) ||
-	            _classification.Contains(OVRSceneManager.Classification.Ceiling) ||
-	            _classification.Contains(OVRSceneManager.Classification.Floor))
-	        {
-	            dimensions.z = 0.01f;
-	        }
-	    }
+            // Special case 02: Set wall thickness to something small instead of default value (1.0m)
+            if (_classification.Contains(OVRSceneManager.Classification.WallFace) ||
+                _classification.Contains(OVRSceneManager.Classification.Ceiling) ||
+                _classification.Contains(OVRSceneManager.Classification.Floor))
+            {
+                dimensions.z = 0.01f;
+            }
+        }
 
         GameObject root = new GameObject("Root");
         root.transform.parent = transform;
@@ -82,16 +85,16 @@ public class FurnitureSpawner : MonoBehaviour
 
     private bool FindValidSpawnable(out Spawnable currentSpawnable)
     {
-	    currentSpawnable = null;
+        currentSpawnable = null;
 
-	    if (!_classification) return false;
+        if (!_classification) return false;
 
         var sceneManager = FindObjectOfType<OVRSceneManager>();
         if (!sceneManager) return false;
 
         foreach (var spawnable in SpawnablePrefabs)
         {
-            if(_classification.Contains(spawnable.ClassificationLabel))
+            if (_classification.Contains(spawnable.ClassificationLabel))
             {
                 currentSpawnable = spawnable;
                 return true;
@@ -123,5 +126,6 @@ public class FurnitureSpawner : MonoBehaviour
         position = plane.position - Vector3.up * halfHeight;
         rotation = Quaternion.LookRotation(-plane.up, Vector3.up);
         localScale = new Vector3(dimensions.x, halfHeight * 2.0f, dimensions.y);
+        //position = new Vector3(position.x, position.y - 1, position.z);
     }
 }
