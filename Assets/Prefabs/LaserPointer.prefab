@@ -45,11 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f8efe4706933b94db15882bb96d2231, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 0}
+  controllerAnchor: {fileID: 0}
   displayText: {fileID: 0}
-  actionBtn: 67108864
-  reactivate: 1
-  lineMaterial: {fileID: 2100000, guid: 1b68ffca77c4c6344af03830dbeca2ca, type: 2}
+  meshRenderToggleAction: 1
+  objectsToggleAction: 2
+  restoreObjectsAction: 512
   lineWidth: 0.01
   lineMaxLength: 50
 --- !u!120 &2788855236190735904

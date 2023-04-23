@@ -247,7 +247,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7068242304679123029, guid: c119a1e32a7b8ed45859fe017e2d4529, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.1
+      value: 0.085
       objectReference: {fileID: 0}
     - target: {fileID: 7068242304679123029, guid: c119a1e32a7b8ed45859fe017e2d4529, type: 3}
       propertyPath: m_LocalRotation.w
@@ -267,11 +267,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7068242304679123029, guid: c119a1e32a7b8ed45859fe017e2d4529, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -0.15
       objectReference: {fileID: 0}
     - target: {fileID: 7068242304679123029, guid: c119a1e32a7b8ed45859fe017e2d4529, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.13
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7068242304679123029, guid: c119a1e32a7b8ed45859fe017e2d4529, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -490,18 +490,6 @@ PrefabInstance:
       propertyPath: controllerAnchor
       value: 
       objectReference: {fileID: 2123182816}
-    - target: {fileID: 319520204907457378, guid: 3531ed12fa011cf47a338a868ecfb790, type: 3}
-      propertyPath: objectsToggleAction
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 319520204907457378, guid: 3531ed12fa011cf47a338a868ecfb790, type: 3}
-      propertyPath: restoreObjectsAction
-      value: 512
-      objectReference: {fileID: 0}
-    - target: {fileID: 319520204907457378, guid: 3531ed12fa011cf47a338a868ecfb790, type: 3}
-      propertyPath: meshRenderToggleAction
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5299251097278419072, guid: 3531ed12fa011cf47a338a868ecfb790, type: 3}
       propertyPath: m_RootOrder
       value: -1
