@@ -1,9 +1,9 @@
-# MetaAdvancedFeatures
-Few VR/Passthrough demos with advanced Meta SDK features in Unity such as scene understanding and shared spatial anchors.
+# Meta SDK Advanced Features
+Few VR/Passthrough demos with advanced Meta SDK features in Unity such as scene understanding and shared spatial anchors. Watch our [full videos 🎥](https://www.youtube.com/playlist?list=PLQMQNmwN3FvzwRdatib0bcC2MSEyUFvlL) demoing and explaining these technologies.
 
 # Supported features:
-- Scene Understanding
-- Shared Spatial Anchors (Coming Soon)
+- Scene Understanding 🎥 [Video](https://youtu.be/UdXwZgRcF7U)
+- Shared Spatial Anchors 🎥 (Coming Soon)
 
 ## Demo Unity Scenes (Features) 🎮
 |Feature GIFs||
