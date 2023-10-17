@@ -58,6 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RoomLightPrefab: {fileID: 4058753717224557943, guid: 931021efef836d04ebf007a05ec77da5, type: 3}
+  FallbackPrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
   SpawnablePrefabs:
   - ResizablePrefab: {fileID: 7329915652745048277, guid: a202d380b0eab3c4fbb4825c00a1e0cf, type: 3}
     ClassificationLabel: FLOOR
@@ -83,3 +84,24 @@ MonoBehaviour:
   - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
     ClassificationLabel: OTHER
     _editorClassificationIndex: 7
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 9e3d47fa7d34b244db95a4f1e63c4d41, type: 3}
+    ClassificationLabel: TABLE
+    _editorClassificationIndex: 13
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
+    ClassificationLabel: LAMP
+    _editorClassificationIndex: 11
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
+    ClassificationLabel: PLANT
+    _editorClassificationIndex: 12
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
+    ClassificationLabel: STORAGE
+    _editorClassificationIndex: 8
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
+    ClassificationLabel: BED
+    _editorClassificationIndex: 9
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 4448d19be5174b04aaffd0f79363db90, type: 3}
+    ClassificationLabel: SCREEN
+    _editorClassificationIndex: 10
+  - ResizablePrefab: {fileID: 7329915652745048277, guid: 00a2c3bff8fb98c48bb2d616fa7cde61, type: 3}
+    ClassificationLabel: WALL_ART
+    _editorClassificationIndex: 14

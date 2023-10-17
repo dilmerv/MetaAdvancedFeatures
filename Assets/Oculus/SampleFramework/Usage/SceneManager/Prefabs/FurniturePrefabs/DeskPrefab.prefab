@@ -26,7 +26,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.13254, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7931217867855206515}
   m_RootOrder: 0
@@ -60,7 +59,6 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8396308771772615998}
   m_Father: {fileID: 0}
@@ -85,12 +83,10 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -116,7 +112,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7329915652745048277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,7 +130,15 @@ MonoBehaviour:
   ScalingY: 0
   PaddingY: 0
   PaddingYMax: 0
+  UseXRatio: 0
+  XRatioMultiplier: 1
   ScalingZ: 0
   PaddingZ: 0
   PaddingZMax: 0
+  NewSize: {x: 0.38664657, y: 0.2650778, z: 0.36273018}
+  DefaultSize: {x: 0.38664657, y: 0.2650778, z: 0.36273018}
+  Mesh: {fileID: 6317106008045385693, guid: 7a109b977f513824da5b75db64b1998d, type: 3}
+  Bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.19332328, y: 0.1325389, z: 0.18136509}
   _pivotTransform: {fileID: 8396308771772615998}

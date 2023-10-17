@@ -42,7 +42,7 @@ namespace MetaAdvancedFeatures.SceneUnderstanding
 
             // fix to desks - for some reason they are upside down with Meta's default code
             OVRSemanticClassification[] allClassifications = FindObjectsOfType<OVRSemanticClassification>()
-                .Where(c => c.Contains(OVRSceneManager.Classification.Desk))
+                .Where(c => c.Contains(OVRSceneManager.Classification.Table))
                 .ToArray();
 
             foreach(var classification in allClassifications)

@@ -19,7 +19,7 @@ namespace Meta.WitAi.Requests
         /// <summary>
         /// Uri customization delegate
         /// </summary>
-        public static event Func<UriBuilder, Uri> OnProvideCustomUri;
+        public static event Func<UriBuilder, UriBuilder> OnProvideCustomUri;
         /// <summary>
         /// Header customization delegate
         /// </summary>
@@ -30,10 +30,14 @@ namespace Meta.WitAi.Requests
         public static event Action<StringBuilder> OnProvideCustomUserAgent;
 
         /// <summary>
+        /// The unique identifier used by Wit to track requests
+        /// </summary>
+        public string RequestId { get; private set; }
+
+        /// <summary>
         /// The configuration used for voice requests
         /// </summary>
-        public IWitRequestConfiguration Configuration => _configuration;
-        private IWitRequestConfiguration _configuration;
+        public IWitRequestConfiguration Configuration { get; private set; }
 
         // Whether or not the configuration's server token should be used
         private bool _useServerToken;
@@ -42,46 +46,54 @@ namespace Meta.WitAi.Requests
         /// Constructor that takes in a configuration interface
         /// </summary>
         /// <param name="configuration">The configuration interface to be used</param>
+        /// <param name="requestId">A unique identifier that can be used to track the request</param>
         /// <param name="useServerToken">Editor only option to use server token instead of client token</param>
-        public WitVRequest(IWitRequestConfiguration configuration, bool useServerToken = false)
+        /// <param name="onDownloadProgress">The callback for progress related to downloading</param>
+        /// <param name="onFirstResponse">The callback for the first response of data from a request</param>
+        public WitVRequest(IWitRequestConfiguration configuration, string requestId, bool useServerToken = false,
+            RequestProgressDelegate onDownloadProgress = null,
+            RequestFirstResponseDelegate onFirstResponse = null) : base(onDownloadProgress, onFirstResponse)
         {
-            _configuration = configuration;
+            Configuration = configuration;
+            RequestId = requestId;
+            if (string.IsNullOrEmpty(RequestId))
+            {
+                RequestId = Guid.NewGuid().ToString();
+            }
             _useServerToken = useServerToken;
         }
 
         // Return uri
         public Uri GetUri(string path, Dictionary<string, string> queryParams = null)
         {
-            return GetWitUri(_configuration, path, queryParams);
+            return GetWitUri(Configuration, path, queryParams);
         }
 
         // Gets wit headers using static header generation
         protected override Dictionary<string, string> GetHeaders()
         {
-            return GetWitHeaders(_configuration, _useServerToken);
+            return GetWitHeaders(Configuration, RequestId, _useServerToken);
         }
 
         #region REQUESTS
         /// <summary>
         /// Perform a generic request
         /// </summary>
-        /// <param name="unityRequest">The unity request</param>
-        /// <param name="onProgress"></param>
-        /// <param name="onComplete"></param>
-        /// <returns></returns>
+        /// <param name="unityRequest">The request to be managed</param>
+        /// <param name="onComplete">The callback delegate on request completion</param>
+        /// <returns>False if the request cannot be performed</returns>
         public override bool Request(UnityWebRequest unityRequest,
-            RequestCompleteDelegate<UnityWebRequest> onComplete,
-            RequestProgressDelegate onProgress = null)
+            RequestCompleteDelegate<UnityWebRequest> onComplete)
         {
             // Ensure configuration is set
-            if (_configuration == null)
+            if (Configuration == null)
             {
                 onComplete?.Invoke(unityRequest, "Cannot perform a request without a Wit configuration");
                 return false;
             }
 
             // Perform base
-            return base.Request(unityRequest, onComplete, onProgress);
+            return base.Request(unityRequest, onComplete);
         }
 
         /// <summary>
@@ -89,16 +101,13 @@ namespace Meta.WitAi.Requests
         /// </summary>
         /// <param name="uriEndpoint">Endpoint name</param>
         /// <param name="uriParams">Endpoint url parameters</param>
-        /// <param name="onComplete">The delegate upon completion</param>
-        /// <param name="onProgress">The download progress</param>
+        /// <param name="onComplete">The callback delegate on request completion</param>
         /// <returns>False if the request cannot be performed</returns>
-        public bool RequestWit<TData>(string uriEndpoint,
+        public bool RequestWitGet<TData>(string uriEndpoint,
             Dictionary<string, string> uriParams,
-            RequestCompleteDelegate<TData> onComplete,
-            RequestProgressDelegate onProgress = null)
+            RequestCompleteDelegate<TData> onComplete)
         {
-            Uri uri = GetUri(uriEndpoint, uriParams);
-            return RequestJson(uri, onComplete, onProgress);
+            return RequestJsonGet(GetUri(uriEndpoint, uriParams), onComplete);
         }
 
         /// <summary>
@@ -107,16 +116,29 @@ namespace Meta.WitAi.Requests
         /// <param name="uriEndpoint">Endpoint name</param>
         /// <param name="uriParams">Endpoint url parameters</param>
         /// <param name="postText">Text to be sent to endpoint</param>
+        /// <param name="onComplete">The callback delegate on request completion</param>
+        /// <returns>False if the request cannot be performed</returns>
+        public bool RequestWitPost<TData>(string uriEndpoint,
+            Dictionary<string, string> uriParams, string postText,
+            RequestCompleteDelegate<TData> onComplete)
+        {
+            return RequestJsonPost(GetUri(uriEndpoint, uriParams), postText, onComplete);
+        }
+
+        /// <summary>
+        /// Put text request to a wit endpoint
+        /// </summary>
+        /// <param name="uriEndpoint">Endpoint name</param>
+        /// <param name="uriParams">Endpoint url parameters</param>
+        /// <param name="putText">Text to be sent to endpoint</param>
         /// <param name="onComplete">The delegate upon completion</param>
         /// <param name="onProgress">The upload progress</param>
         /// <returns>False if the request cannot be performed</returns>
-        public bool RequestWit<TData>(string uriEndpoint,
-            Dictionary<string, string> uriParams, string postText,
-            RequestCompleteDelegate<TData> onComplete,
-            RequestProgressDelegate onProgress = null)
+        public bool RequestWitPut<TData>(string uriEndpoint,
+            Dictionary<string, string> uriParams, string putText,
+            RequestCompleteDelegate<TData> onComplete)
         {
-            Uri uri = GetUri(uriEndpoint, uriParams);
-            return RequestJson(uri, postText, onComplete, onProgress);
+            return RequestJsonPut(GetUri(uriEndpoint, uriParams), putText, onComplete);
         }
         #endregion
 
@@ -130,16 +152,16 @@ namespace Meta.WitAi.Requests
             UriBuilder uriBuilder = new UriBuilder();
 
             // Append endpoint data
-            WitRequestEndpointOverride endpoint = configuration.GetEndpointOverrides();
-            uriBuilder.Scheme = string.IsNullOrEmpty(endpoint.uriScheme) ? WitConstants.URI_SCHEME : endpoint.uriScheme;
-            uriBuilder.Host = string.IsNullOrEmpty(endpoint.authority) ? WitConstants.URI_AUTHORITY : endpoint.authority;
-            uriBuilder.Port = endpoint.port <= 0 ?  WitConstants.URI_DEFAULT_PORT : endpoint.port;
-            string apiVersion = string.IsNullOrEmpty(endpoint.witApiVersion) ? WitConstants.API_VERSION : endpoint.witApiVersion;
+            IWitRequestEndpointInfo endpoint = configuration.GetEndpointInfo();
+            uriBuilder.Scheme = endpoint.UriScheme;
+            uriBuilder.Host = endpoint.Authority;
+            uriBuilder.Port = endpoint.Port;
 
             // Set path
             uriBuilder.Path = path;
 
             // Build query
+            string apiVersion = endpoint.WitApiVersion;
             uriBuilder.Query = $"v={apiVersion}";
             if (queryParams != null)
             {
@@ -152,7 +174,10 @@ namespace Meta.WitAi.Requests
             // Return custom uri
             if (OnProvideCustomUri != null)
             {
-                return OnProvideCustomUri(uriBuilder);
+                foreach (Func<UriBuilder, UriBuilder> del in OnProvideCustomUri.GetInvocationList())
+                {
+                    uriBuilder = del(uriBuilder);
+                }
             }
 
             // Return uri
@@ -161,13 +186,13 @@ namespace Meta.WitAi.Requests
         /// <summary>
         /// Obtain headers to be used with every wit service
         /// </summary>
-        public static Dictionary<string, string> GetWitHeaders(IWitRequestConfiguration configuration, bool useServerToken)
+        public static Dictionary<string, string> GetWitHeaders(IWitRequestConfiguration configuration, string requestId, bool useServerToken)
         {
             // Get headers
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
             // Set request id
-            headers[WitConstants.HEADER_REQUEST_ID] = Guid.NewGuid().ToString();
+            headers[WitConstants.HEADER_REQUEST_ID] = string.IsNullOrEmpty(requestId) ? Guid.NewGuid().ToString() : requestId;
             // Set User-Agent
             headers[WitConstants.HEADER_USERAGENT] = GetUserAgentHeader(configuration);
             // Set authorization
@@ -223,9 +248,6 @@ namespace Meta.WitAi.Requests
         {
             // Generate user agent
             StringBuilder userAgent = new StringBuilder();
-
-            // Append prefix if any exists
-            userAgent.Append(WitConstants.HEADER_USERAGENT_PREFIX);
 
             // Append wit sdk version
             userAgent.Append($"wit-unity-{WitConstants.SDK_VERSION}");

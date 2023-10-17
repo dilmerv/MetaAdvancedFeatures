@@ -7,6 +7,7 @@
  */
 
 using System;
+using Meta.WitAi.Data.Configuration;
 using Meta.WitAi.Data.Info;
 
 namespace Meta.WitAi
@@ -14,13 +15,24 @@ namespace Meta.WitAi
     /// <summary>
     /// Endpoint overrides
     /// </summary>
-    [Serializable]
-    public struct WitRequestEndpointOverride
+    public interface IWitRequestEndpointInfo
     {
-        public string uriScheme;
-        public string authority;
-        public string witApiVersion;
-        public int port;
+        // Setup
+        string UriScheme { get; }
+        string Authority { get; }
+        int Port { get; }
+        string WitApiVersion { get; }
+
+        // Voice Command Endpoints
+        string Message { get; }
+        string Speech { get; }
+        // Dictation Endpoint
+        string Dictation { get; }
+        // TTS Endpoint
+        string Synthesize { get; }
+        // Composer Endpoints
+        string Event { get; }
+        string Converse { get; }
     }
 
     /// <summary>
@@ -31,23 +43,31 @@ namespace Meta.WitAi
         string GetConfigurationId();
         string GetApplicationId();
         WitAppInfo GetApplicationInfo();
-        WitRequestEndpointOverride GetEndpointOverrides();
+        WitConfigurationAssetData[] GetConfigData();
+        IWitRequestEndpointInfo GetEndpointInfo();
         string GetClientAccessToken();
 #if UNITY_EDITOR
         void SetClientAccessToken(string newToken);
         string GetServerAccessToken();
         void SetApplicationInfo(WitAppInfo appInfo);
+
+        void SetConfigData(WitConfigurationAssetData[] configData);
 #endif
+        /// <summary>
+        /// Refreshes the individual data components of the configuration.
+        /// </summary>
+        void UpdateDataAssets();
     }
 
 #if UNITY_EDITOR
     /// <summary>
     /// A simple configuration for initial setup
     /// </summary>
-    public class WitServerRequestConfiguration : IWitRequestConfiguration
+    public class WitServerRequestConfiguration : IWitRequestConfiguration, IWitRequestEndpointInfo
     {
         private string _clientToken;
         private string _serverToken;
+        private WitConfigurationAssetData[] _configurationData =  Array.Empty<WitConfigurationAssetData>();
 
         public WitServerRequestConfiguration(string serverToken)
         {
@@ -57,15 +77,36 @@ namespace Meta.WitAi
         public string GetConfigurationId() => null;
         public string GetApplicationId() => null;
         public WitAppInfo GetApplicationInfo() => new WitAppInfo();
+        public WitConfigurationAssetData[] GetConfigData() => _configurationData;
 
         public void SetApplicationInfo(WitAppInfo newInfo)
         {
         }
+        public void SetConfigData(WitConfigurationAssetData[] configData)
+        {
+            _configurationData = configData;
+        }
+        public void UpdateDataAssets()
+        {
+            //nothing to do by default.
+        }
 
-        public WitRequestEndpointOverride GetEndpointOverrides() => new WitRequestEndpointOverride();
         public string GetClientAccessToken() => _clientToken;
         public void SetClientAccessToken(string newToken) => _clientToken = newToken;
         public string GetServerAccessToken() => _serverToken;
+
+        // Endpoint info
+        public IWitRequestEndpointInfo GetEndpointInfo() => this;
+        public string UriScheme => WitConstants.URI_SCHEME;
+        public string Authority => WitConstants.URI_AUTHORITY;
+        public string WitApiVersion => WitConstants.API_VERSION;
+        public int Port => WitConstants.URI_DEFAULT_PORT;
+        public string Message => WitConstants.ENDPOINT_MESSAGE;
+        public string Speech => WitConstants.ENDPOINT_SPEECH;
+        public string Dictation => WitConstants.ENDPOINT_DICTATION;
+        public string Synthesize => WitConstants.ENDPOINT_TTS;
+        public string Event => WitConstants.ENDPOINT_COMPOSER_MESSAGE;
+        public string Converse => WitConstants.ENDPOINT_COMPOSER_SPEECH;
     }
 #endif
 }

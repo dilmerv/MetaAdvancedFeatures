@@ -7,6 +7,11 @@ public class FurnitureSpawner : MonoBehaviour
 {
     [Tooltip("Add a point at ceiling.")]
     public GameObject RoomLightPrefab;
+
+    [Tooltip("This prefab will be used if the label is " +
+        "not in the SpawnablesPrefabs")]
+    public SimpleResizable FallbackPrefab;
+
     public List<Spawnable> SpawnablePrefabs;
 
     private OVRSceneAnchor _sceneAnchor;
@@ -21,15 +26,11 @@ public class FurnitureSpawner : MonoBehaviour
         _classification = GetComponent<OVRSemanticClassification>();
         AddRoomLight();
         SpawnSpawnable();
-
-        if(_classification.Contains(OVRSceneManager.Classification.Desk))
-            transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z * -1);
     }
 
     private void SpawnSpawnable()
     {
-        Spawnable currentSpawnable;
-        if (!FindValidSpawnable(out currentSpawnable))
+        if (!FindValidSpawnable(out var currentSpawnable))
         {
             return;
         }
@@ -50,7 +51,7 @@ public class FurnitureSpawner : MonoBehaviour
             dimensions.z = 1;
 
             // Special case 01: Has only top plane
-            if (_classification.Contains(OVRSceneManager.Classification.Desk) ||
+            if (_classification.Contains(OVRSceneManager.Classification.Table) ||
                 _classification.Contains(OVRSceneManager.Classification.Couch))
             {
                 GetVolumeFromTopPlane(
@@ -80,10 +81,10 @@ public class FurnitureSpawner : MonoBehaviour
         root.transform.SetPositionAndRotation(position, rotation);
 
         SimpleResizer resizer = new SimpleResizer();
-        resizer.CreateResizedObject(dimensions, root, currentSpawnable.ResizablePrefab);
+        resizer.CreateResizedObject(dimensions, root, currentSpawnable);
     }
 
-    private bool FindValidSpawnable(out Spawnable currentSpawnable)
+    private bool FindValidSpawnable(out SimpleResizable currentSpawnable)
     {
         currentSpawnable = null;
 
@@ -96,9 +97,15 @@ public class FurnitureSpawner : MonoBehaviour
         {
             if (_classification.Contains(spawnable.ClassificationLabel))
             {
-                currentSpawnable = spawnable;
+                currentSpawnable = spawnable.ResizablePrefab;
                 return true;
             }
+        }
+
+        if (FallbackPrefab != null)
+        {
+            currentSpawnable = FallbackPrefab;
+            return true;
         }
 
         return false;
@@ -126,6 +133,5 @@ public class FurnitureSpawner : MonoBehaviour
         position = plane.position - Vector3.up * halfHeight;
         rotation = Quaternion.LookRotation(-plane.up, Vector3.up);
         localScale = new Vector3(dimensions.x, halfHeight * 2.0f, dimensions.y);
-        //position = new Vector3(position.x, position.y - 1, position.z);
     }
 }
